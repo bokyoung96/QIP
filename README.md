@@ -1,0 +1,2 @@
+# QIP
+Quantitative Investing Platform
