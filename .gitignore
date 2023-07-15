@@ -1,5 +1,6 @@
 # ADD
 .DS_Store
+login.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
