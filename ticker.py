@@ -41,7 +41,6 @@ class Ticker(AutoLogin):
         if not self.config_connect:
             self.process_connect(login_info=login_info)
 
-        self.objCpCodeMgr = win32com.client.Dispatch("CpUtil.CpCodeMgr")
         self.mkt = mkt
 
     @property
@@ -74,6 +73,6 @@ class Ticker(AutoLogin):
 
 
 if __name__ == "__main__":
-    ticker = Ticker(mkt='TEMP')
+    ticker = Ticker(mkt='KOSPI')
     info = ticker.get_ticker_info
     print(info)
