@@ -6,9 +6,16 @@ import win32com.client
 from pywinauto import application
 
 
-class AutoLogin:
+class ClientDispatch:
     def __init__(self):
         self.obj_CpUtil_CpCybos = win32com.client.Dispatch('CpUtil.CpCybos')
+        self.objCpCodeMgr = win32com.client.Dispatch("CpUtil.CpCodeMgr")
+        self.objStockWeek = win32com.client.Dispatch('DsCbo1.StockWeek')
+
+
+class AutoLogin(ClientDispatch):
+    def __init__(self):
+        super().__init__()
 
     @property
     def config_connect(self):
