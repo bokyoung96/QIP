@@ -1,9 +1,10 @@
 import pandas as pd
 
 from auto_login import *
+from ticker import *
 
 
-class RequestData(AutoLogin):
+class RequestData(Ticker):
     def __init__(self, login_info='login.json'):
         super().__init__()
         if not self.config_connect:
@@ -55,6 +56,9 @@ class RequestData(AutoLogin):
             temp = pd.DataFrame(self.price_request,
                                 columns=['Date', 'Open', 'High', 'Low', 'Close', 'Diff', 'Vol'])
             res = pd.concat([res, temp], axis=0)
+
+        res = res[::-1].reset_index(drop=True)
+        res.Date = pd.to_datetime(res.Date, format='%Y%m%d')
         return res
 
 
@@ -62,3 +66,7 @@ if __name__ == "__main__":
     request_data = RequestData()
     SSE_price = request_data.get_request('A005930')
     print(SSE_price)
+
+# TODO: 데이터가 존재하지 않을 경우, NaN 처리
+# TODO: 2023/05/23까지만 로드되는 데이터 (가장 최근은?)
+# TODO: 수정주가 로드하는 방법
