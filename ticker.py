@@ -38,8 +38,9 @@ class Ticker(AutoLogin):
                  mkt: str = "KOSPI",
                  login_info: str = "login.json"):
         super().__init__()
+        self.login_info = login_info
         if not self.config_connect:
-            self.process_connect(login_info=login_info)
+            self.process_connect(login_info=self.login_info)
 
         self.mkt = mkt
 

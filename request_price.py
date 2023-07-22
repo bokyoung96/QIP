@@ -3,11 +3,10 @@ import datetime as dt
 import numpy as np
 import pandas as pd
 
+from datetime import datetime, timedelta
 from ticker import *
 
 DATA = ['Ticker', 'StockSection', 'Date', 'Close']
-ROW = list(range(len(DATA)))
-ROWS = []
 
 
 class RequestPrice(Ticker):
@@ -26,8 +25,13 @@ class RequestPrice(Ticker):
                         dt.timedelta(days=1)).strftime("%Y%m%d")
         else:
             self.end = end
+
         self.obj = self.objStockChart
+
         self.ticker = self.get_ticker_info
+        self.ROW = list(range(len(DATA)))
+        self.ROWS = []
+        self.res = None
 
     @property
     def config_request(self):
@@ -73,7 +77,7 @@ class RequestPrice(Ticker):
                 print('Waiting...')
 
     @property
-    def get_reqeust(self) -> list:
+    def get_request(self) -> list:
         """
         Request data from API in order.
         """
@@ -85,12 +89,12 @@ class RequestPrice(Ticker):
 
             numDate = self.obj.GetHeaderValue(3)
             for num in range(numDate):
-                ROW[0] = item['Ticker']
-                ROW[1] = item['StockSection']
-                ROW[2] = self.obj.GetDataValue(0, num)
-                ROW[3] = self.obj.GetDataValue(1, num)
-                ROWS.append(list(ROW))
-        return ROWS
+                self.ROW[0] = item['Ticker']
+                self.ROW[1] = item['StockSection']
+                self.ROW[2] = self.obj.GetDataValue(0, num)
+                self.ROW[3] = self.obj.GetDataValue(1, num)
+                self.ROWS.append(list(self.ROW))
+        return self.ROWS
 
     @staticmethod
     def pp_extract_dates(df: pd.DataFrame) -> list:
@@ -124,29 +128,66 @@ class RequestPrice(Ticker):
             lambda x: x + [np.nan] * (max_date - len(x)))
         return res
 
+    @classmethod
+    def pp_dt_storage(cls, start, end):
+        """
+        Get datetime for class <RequestSplit> get_split_price.
+        """
+        return cls(start, end)
+
     def get_price(self) -> pd.DataFrame:
         """
         Get time-series price data.
         """
-        df = pd.DataFrame(self.get_reqeust, columns=DATA)
+        df = pd.DataFrame(self.get_request, columns=DATA)
         dates = self.pp_extract_dates(df)
         temp = self.pp_append_nans(df)
-        res = pd.DataFrame(temp['Close'].tolist(),
-                           index=temp['Ticker'],
-                           columns=dates).T[::-1]
+        self.res = pd.DataFrame(temp['Close'].tolist(),
+                                index=temp['Ticker'],
+                                columns=dates).T[::-1]
+        return self.res
+
+
+class RequestSplit(RequestPrice):
+    def __init__(self,
+                 start: str,
+                 end: str = "TODAY",
+                 mkt: str = "KOSPI",
+                 login_info: str = "login.json"):
+        super().__init__(start, end, mkt, login_info)
+        self.time_interval = timedelta(days=252 * 3)
+
+    def pp_time_diff(self) -> list:
+        """
+        Limit time difference to 3-year business days.
+        Slice time interval.
+        """
+        start_dt = datetime.strptime(self.start, "%Y%m%d")
+        end_dt = datetime.strptime(self.end, "%Y%m%d")
+
+        res_dt = []
+        while start_dt < end_dt:
+            next_dt = start_dt + self.time_interval
+            res_dt.append([datetime.strftime(start_dt, "%Y%m%d"),
+                           datetime.strftime(min(next_dt, end_dt), "%Y%m%d")])
+            start_dt = next_dt + timedelta(days=1)
+        return res_dt
+
+    def get_split_price(self) -> pd.DataFrame:
+        """
+        Get time-series price data.
+        """
+        res_dt = self.pp_time_diff()
+
+        temp = []
+        for start, end in res_dt:
+            request_price = RequestPrice.pp_dt_storage(start, end)
+            temp.append(request_price.get_price())
+
+        res = pd.concat(temp)
+        res.index = pd.to_datetime(res.index, format="%Y%m%d")
         return res
 
 
 # TODO: start date에 존재하지 않는 기업 배제: 추가 방안?
-# TODO: 주가 나눠서 받고, 합치기 (최대 한도 존재)
-
-
-if __name__ == "__main__":
-    start_time = time.time()
-
-    request_price = RequestPrice(start='20210120')
-    res = request_price.get_price()
-    print(res)
-
-    end_time = time.time()
-    print('Time elapsed: {:.5f}sec'.format(end_time - start_time))
+# TODO: task kill issue
