@@ -71,7 +71,7 @@ class Ticker(AutoLogin):
         return df
 
 
-if __name__ == "__main__":
-    ticker = Ticker(mkt='KOSPI')
-    info = ticker.get_ticker_info
-    print(info)
+# if __name__ == "__main__":
+#     ticker = Ticker(mkt='KOSPI')
+#     info = ticker.get_ticker_info
+#     print(info)
