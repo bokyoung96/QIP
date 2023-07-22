@@ -1,6 +1,5 @@
 import pandas as pd
 
-from auto_login import *
 from ticker import *
 
 
@@ -26,7 +25,6 @@ class RequestData(Ticker):
 
     @property
     def price_request(self):
-        self.config_request
         count = self.obj.GetHeaderValue(1)
 
         info = []

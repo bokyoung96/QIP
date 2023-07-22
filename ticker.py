@@ -63,12 +63,11 @@ class Ticker(AutoLogin):
         ticker_info = []
         for ticker in tickers:
             stockSection = self.objCpCodeMgr.GetStockSectionKind(ticker)
-            stdPrice = self.objCpCodeMgr.GetStockStdPrice(ticker)
             name = self.objCpCodeMgr.CodeToName(ticker)
-            ticker_info.append([ticker, stockSection, stdPrice, name])
+            ticker_info.append([ticker, stockSection, name])
 
         df = pd.DataFrame(ticker_info,
-                          columns=["Ticker", "StockSection", "StdPrice", "Name"])
+                          columns=["Ticker", "StockSection", "Name"])
         return df
 
 

@@ -11,6 +11,7 @@ class ClientDispatch:
         self.obj_CpUtil_CpCybos = win32com.client.Dispatch('CpUtil.CpCybos')
         self.objCpCodeMgr = win32com.client.Dispatch("CpUtil.CpCodeMgr")
         self.objStockWeek = win32com.client.Dispatch('DsCbo1.StockWeek')
+        self.objStockChart = win32com.client.Dispatch("CpSysDib.StockChart")
 
 
 class AutoLogin(ClientDispatch):
