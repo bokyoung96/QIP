@@ -12,3 +12,5 @@ if __name__ == "__main__":
 
     end_time = time.time()
     print('Time elapsed: {:.5f}sec'.format(end_time - start_time))
+    AutoLogin.process_disconnect
+    AutoLogin.process_kill
