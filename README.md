@@ -16,3 +16,7 @@ CODE REFERRED
 -
 1. https://wikidocs.net/book/110
 2. http://cybosplus.github.io/
+
+ETC
+-
+1. login_info.json & login_DB_info.json not uploaded.
