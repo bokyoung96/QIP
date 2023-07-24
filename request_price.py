@@ -3,6 +3,8 @@ import datetime as dt
 import numpy as np
 import pandas as pd
 
+from itertools import chain
+
 from preprocess import *
 from ticker import *
 
@@ -27,9 +29,8 @@ class RequestPrice(Ticker):
 
         self.obj = self.objStockChart
 
-        self.ticker = self.get_ticker_info[:5]
+        self.ticker = self.get_ticker_info
         self.ROW = list(range(len(DATA)))
-        self.ROWS = []
         self.res = None
 
     @property
@@ -80,6 +81,7 @@ class RequestPrice(Ticker):
         """
         Request data from API in order.
         """
+        ROWS = []
         self.get_input_value
         for idx, item in self.ticker.iterrows():
             self.get_request_count(item=item)
@@ -92,8 +94,8 @@ class RequestPrice(Ticker):
                 self.ROW[1] = item['StockSection']
                 self.ROW[2] = self.obj.GetDataValue(0, num)
                 self.ROW[3] = self.obj.GetDataValue(1, num)
-                self.ROWS.append(list(self.ROW))
-        return self.ROWS
+                ROWS.append(list(self.ROW))
+        return ROWS
 
     @classmethod
     def pp_dt_storage(cls, start, end):
@@ -122,15 +124,25 @@ class RequestSplit(RequestPrice):
                  mkt: str = "KOSPI",
                  login_info: str = "login.json"):
         super().__init__(start, end, mkt, login_info)
+        self.time_diff = self.preprocess.pp_time_diff()
+
+    def get_split_request(self) -> list:
+        """
+        Get request data for SQL.
+        """
+        temp = []
+        for start, end in self.time_diff:
+            request_price = RequestPrice.pp_dt_storage(start, end)
+            temp.append(request_price.get_request)
+        res = list(chain(*temp))
+        return res
 
     def get_split_price(self) -> pd.DataFrame:
         """
         Get time-series price data.
         """
-        res_dt = self.preprocess.pp_time_diff()
-
         temp = []
-        for start, end in res_dt:
+        for start, end in self.time_diff:
             request_price = RequestPrice.pp_dt_storage(start, end)
             temp.append(request_price.get_price())
 
