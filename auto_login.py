@@ -1,3 +1,5 @@
+# 32bit env required
+
 import os
 import time
 import json
