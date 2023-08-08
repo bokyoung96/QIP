@@ -20,3 +20,4 @@ CODE REFERRED
 ETC
 -
 1. login_info.json & login_DB_info.json not uploaded.
+2. Certain DB python files are optimized under 64bit environment.
