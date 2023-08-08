@@ -1,3 +1,5 @@
+# 32bit env required
+
 import time
 import datetime as dt
 import numpy as np

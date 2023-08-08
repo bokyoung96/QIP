@@ -1,3 +1,5 @@
+# 32bit env required
+
 import pandas as pd
 
 from enum import Enum, unique
